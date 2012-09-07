@@ -281,8 +281,6 @@
           vertex.ghostMarker.setMap(null);
         }
         
-        console.log(this.editIndex);
-        
         polyline.getPath().removeAt(this.editIndex);
         
         if (previous) {
