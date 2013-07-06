@@ -40,6 +40,7 @@
       options = options || {};
       
       options.ghosts = options.ghosts || (options.ghosts === undefined);
+      options.fixedEndpoints = options.fixedEndpoints || false;
       options.imagePath = options.imagePath || google.maps.Polyline.prototype.edit.settings.imagePath;
       
       if (options.ghosts) {
@@ -239,7 +240,11 @@
       }
 
       function vertexRightClick() {
-        if (!options.ghosts){ return; }
+        if (!options.ghosts)
+            return;
+        
+        if (options.fixedEndpoints && (this.editIndex == 0 || this.editIndex == polyline.getPath().getLength() - 1))
+            return;
         
         var vertex = at(this.editIndex),
           previous = at(this.editIndex - 1);
@@ -275,7 +280,7 @@
         google.maps.event.trigger(polyline, 'remove_at', this.editIndex, vertex);
       }
 
-      function createMarkerVertex(point) {
+      function createMarkerVertex(point, index) {
         var vertex = point.marker;
         
         if (!vertex){
@@ -283,7 +288,7 @@
             position: point,
             map: polyline.getMap(),
             icon: imgVertex,
-            draggable: true,
+            draggable: !(options.fixedEndpoints && (index == 0 || index == polyline.getPath().getLength() - 1)),
             raiseOnDrag: false
           });
           
@@ -302,7 +307,7 @@
       }
 
       polyline.getPath().forEach(function (vertex, index) {
-        createMarkerVertex(vertex).editIndex = index;
+        createMarkerVertex(vertex, index).editIndex = index;
         if (options.ghosts) {
           createGhostMarkerVertex(vertex);
         }
